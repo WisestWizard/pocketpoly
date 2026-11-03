@@ -1,0 +1,19 @@
+# Pocket Poly's build settings (fm1-base's tools/build.py: ../build.sh)
+name = "pocketpoly"            # the build's files: pocketpoly.fwsc, pocketpoly-X.Y.fwsc
+id_prefix = "FM-1_13"          # package identity (each firmware its own): dev FM-1_1300, releases FM-1_13XXYYZZ.
+                               # Check the Firmware Hub catalogue for a clash before the first public release.
+usb_manufacturer = "Pocket Poly"
+usb_product = "POCKET POLY FM-1"
+include = ["engine"]
+o2 = ["engine/engine.c", "engine/wt.c", "engine/fx.c", "engine/fm.c"]   # the engine, the wavetables, the effects: their own units at -O2
+words = "words.tsv"
+ble = true                     # Bluetooth MIDI with a computer, phone or tablet (JieLi's stack; --no-ble builds without it)
+ble_central = true             # and the FM-1 connects to Bluetooth MIDI keyboards and controllers too
+cpu2 = true                    # the second core renders half the voices (plat_cpu2_*)
+cpu2_fallback = true           # if it misreads or is late: one core until power-off, no restart
+usb_audio_in = true            # the master output recordable over USB
+usb_audio_out = false
+# the site (tools/make_site.py)
+tagline = "a stereo polysynth with a discovery engine for the FM-1"
+licence = "MPL-2.0"
+credits = "Built on fm1-base and felucca-bsp, from Felucca by Leo Kuroshita (Hügelton Instruments)."

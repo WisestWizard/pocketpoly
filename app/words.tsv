@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: MPL-2.0
+# Pocket Poly's words for a screen reader (fm1-reader): the text on the screen <TAB> what to say.
+# url: https://pocketpoly.invalid/words/
+POCKET POLY	pocket poly
+CUT	cutoff
+RES	resonance
+FENV	filter envelope amount
+REL	release
+ATK	attack
+DEC	decay
+SUS	sustain
+OSC1	oscillator 1
+OSC2	oscillator 2
+SEMI	semitones
+FINE	fine tune
+SUB	sub oscillator
+NOISE	noise
+PW	pulse width
+DRIVE	drive
+KEYTRK	key tracking
+LFO	L F O
+RATE	rate
+SHAPE	shape
+PITCH	pitch
+SPREAD	stereo spread
+DRIFT	drift
+GLIDE	glide
+VEL>AMP	velocity to amp
+VEL>FLT	velocity to filter
+AMP ENV	amp envelope
+FLT ENV	filter envelope
+FILTER	filter
+SAVE TO	save to
+SAW	saw
+PULSE	pulse
+TRI	triangle
+SINE	sine
+SQR	square
+S&H	sample and hold
+MODEL	model
+XMOD	cross modulation
+RING	ring modulation
+SYNC	sync
+LOOP	loop
+OSC B	oscillator B
+MIX	mix
+VOICE	voice
+ENS	ensemble
+ENS MIX	ensemble mix
+DLY SEND	delay send
+REV SEND	reverb send
+DLY TIME	delay time
+DLY FDBK	delay feedback
+REV SIZE	reverb size
+REV DAMP	reverb damping
+MOD ENV	modulation envelope
+MOD	modulation
+MACROS	macros
+SLOT	slot
+SRC	source
+DST	destination
+AMT	amount
+M1 NAME	macro 1 name
+M2 NAME	macro 2 name
+M3 NAME	macro 3 name
+M4 NAME	macro 4 name
+BRITE	brightness
+TIMBRE	timbre
+MOTION	motion
+SPACE	space
+WOBBLE	wobble
+GRIT	grit
+WIDTH	width
+TAIL	tail
+AIR	air
+PD	phase distortion
+WT A	wavetable A
+WT B	wavetable B
+WT C	wavetable C
+CHOR I	chorus one
+CHOR II	chorus two
+ENSEMBLE	ensemble
+VELO	velocity
+PRESS	pressure
+WHEEL	mod wheel
+RANDOM	random
+SHAPE A	shape A
+SHAPE B	shape B
+PITCH B	pitch B
+LFO1 RT	L F O 1 rate
+DLY SND	delay send
+REV SND	reverb send
+ARP 1	arp page 1
+ARP 2	arp page 2
+ARP 3	arp page 3
+TURING	turing
+DISCOVER	discover
+OCTAVES	octaves
+GATE	gate
+SWING	swing
+HITS	hits
+STEPS	steps
+ROTATE	rotate
+CHANCE	chance
+RATCHET	ratchet
+LATCH	latch
+LENGTH	length
+LOCK	lock
+REPEAT	repeat
+BPM	B P M
+SEED	seed
+MUTATE	mutate
+MUTATED	mutated
+MORPH	morph
+HISTORY	history
+DICE	dice
+SET A	set A
+SET B	set B
+UP DN	up down
+CONV	converge
+DIVERGE	diverge
+PINKY	pinky
+THUMB	thumb
+CHORD	chord
+ORDER	order
+WALK	walk
+EXT	external
+ARP SEED	arp seed
+ARP>	arp running
+FM6	six operator F M
+FM	F M
+BRIGHT	brightness
+FEEDBACK	feedback
+LIVE	live voice
+E.PIANO	electric piano
+FM BASS	F M bass
+BRASS	brass
+BELL	bell
+GLASS PAD	glass pad
+MARIMBA	marimba
+ORGAN	organ
+FM LEAD	F M lead
+FM DICE	F M dice
+DX7	D X 7
+FX LAYER: THE KEYS SWITCH	F X layer: the keys switch the effects
+NOT IN PATCH	not in patch
+ENSEMBLE	ensemble
+DELAY	delay
+REVERB	reverb
+MIDI	midi
+IN CH	input channel
+OUT CH	output channel
+CLOCK OUT	clock out
+LOCAL	local
+OMNI	omni
+MIDI IN	midi in
+MIDI OUT	midi out
+KEYS	keys

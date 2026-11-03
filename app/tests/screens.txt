@@ -1,0 +1,45 @@
+# The manual's screenshots (app/docs/img): ./build.sh --host, then
+#   app/build/host/pocketpoly_host app/tests/screens.txt app/docs/img
+wait 900
+shot screen-home.png
+turn PRESET 4
+wait 30
+midi 90 30 70
+midi 90 37 70
+midi 90 3C 70
+wait 1400
+shot screen-playing.png
+midi B0 7B 00
+tap EDIT
+wait 1400
+shot screen-osc.png
+tap SEL
+wait 1400
+shot screen-mod.png
+tap SEL
+tap SEL
+wait 1400
+shot screen-midi.png
+tap FX
+tap FX
+wait 1400
+shot screen-fx.png
+tap EDIT
+tap EDIT
+tap EDIT
+tap EDIT
+tap EDIT
+wait 1400
+shot screen-fm.png
+tap ARP
+wait 1400
+shot screen-arp.png
+press SEQ
+wait 900
+release SEQ
+wait 1400
+shot screen-discover.png
+tap SAVE
+wait 1400
+shot screen-save.png
+tap OCT-

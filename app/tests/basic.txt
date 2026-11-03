@@ -1,0 +1,1170 @@
+# Pocket Poly in the host simulator: ./build.sh --host, then
+#   app/build/host/pocketpoly_host app/tests/basic.txt app/build/host
+# parameter numbers (expect pN): 0 OSC1 MODEL, 10 XMOD, 11 RING, 12 SYNC, 15 FILT TYPE, 50 MACRO 1, 54 M1 NAME,
+#   78/79/80 slot 1's source / destination / amount; 58 ARP ON, 59 ARP MODE, 60 DIV, 61 OCTAVES, 64 STEPS, 65 HITS;
+#   75 FM VOICE; 13 CUTOFF, 14 RES, 23 AMP ATK, 26 AMP REL, 43 ENS MIX, 46 DLY SEND, 49 REV SEND (the CC map)
+wait 600
+shot boot.png
+expect preset 0
+expect voices 0
+expect p38 64
+# a key: a voice, the note on the screen, the note out over USB
+key 7 down
+wait 60
+expect note 60
+expect voices 1
+expect midi_out 1
+shot key.png
+key 9 down
+wait 60
+expect voices 2
+key 7 up
+key 9 up
+wait 900
+expect voices 0
+expect note -1
+# octave
+tap OCT+
+wait 30
+expect octave 1
+expect dirty 1
+key 7 down
+wait 60
+expect note 72
+key 7 up
+wait 900
+tap OCT-
+wait 30
+expect octave 0
+# polyphony: ten notes in over MIDI, eight voices; all notes off releases them
+midi 90 3C 64
+midi 90 3E 64
+midi 90 40 64
+midi 90 41 64
+midi 90 43 64
+midi 90 45 64
+midi 90 47 64
+midi 90 48 64
+midi 90 4A 64
+midi 90 4C 64
+wait 60
+expect voices 8
+expect note 76
+midi B0 7B 00
+wait 900
+expect voices 0
+# HOME: the macros on the knobs; FILTER: the cutoff; every button opens its pages
+expect page 0
+turn K1 10
+wait 50
+expect p50 10
+tap FX
+wait 30
+expect page 5
+expect cutoff 110
+turn K1 -10
+wait 50
+expect cutoff 100
+turn K1 5
+wait 50
+expect cutoff 105
+tap FX
+wait 30
+expect page 6
+tap FX
+wait 30
+expect page 7
+tap FX
+wait 30
+expect page 5
+tap EDIT
+wait 30
+expect page 1
+tap EDIT
+tap EDIT
+tap EDIT
+wait 30
+expect page 4
+tap ENV
+wait 30
+expect page 8
+tap ENV
+tap ENV
+wait 30
+expect page 10
+tap LFO
+wait 30
+expect page 11
+tap LFO
+wait 30
+expect page 12
+turn SELECT -1
+wait 30
+expect page 11
+tap SEL
+wait 30
+expect page 13
+tap SEL
+wait 30
+expect page 14
+tap HOME
+wait 30
+expect page 0
+shot home.png
+# ALGO: the filter type
+turn ALGO 1
+wait 30
+expect p15 1
+turn ALGO -1
+wait 30
+expect p15 0
+# OSC A: the model steps one per detent; MIX: cross modulation and ring; VOICE: sync toggles
+tap EDIT
+wait 30
+turn K1 5
+wait 50
+expect p0 5
+tap EDIT
+tap EDIT
+wait 30
+expect page 3
+turn K3 20
+wait 50
+expect p10 20
+turn K4 10
+wait 50
+expect p11 10
+tap EDIT
+wait 30
+turn K1 1
+wait 30
+expect p12 127
+turn K1 1
+wait 30
+expect p12 0
+# MOD: slot 1 is MACRO 1 -> CUTOFF; K2 steps the source, K4 the amount; MACROS: K1 renames macro 1
+tap SEL
+wait 30
+expect page 13
+turn K2 1
+wait 30
+expect p78 10
+turn K4 -4
+wait 50
+expect p80 106
+turn K1 2
+wait 30
+tap SEL
+wait 30
+expect page 14
+turn K1 1
+wait 30
+expect p54 2
+tap HOME
+wait 30
+# presets: PRESET browses; a factory patch loads clean
+turn PRESET 1
+wait 30
+expect preset 1
+expect cutoff 100
+expect dirty 1
+# save: the edited patch into U2, kept across a reboot
+tap FX
+wait 30
+turn K1 3
+wait 30
+expect cutoff 103
+tap SAVE
+wait 30
+expect dialog 1
+shot save.png
+turn K1 1
+wait 30
+tap OCT+
+wait 60
+expect dialog 0
+expect preset 9
+expect dirty 0
+expect store_writes 2
+reboot
+wait 600
+expect preset 9
+expect cutoff 103
+# the dialog backs out on OCT-
+tap SAVE
+wait 30
+expect dialog 1
+tap OCT-
+wait 30
+expect dialog 0
+expect preset 9
+tap HOME
+wait 30
+# the arp: PLAY switches it on; a held chord plays up at 120 bpm sixteenths (125 ms a step), out over MIDI too
+midi C0 00
+wait 60
+expect bpm 120
+tap PLAY
+wait 30
+expect p58 127
+midi 90 3C 64
+midi 90 40 64
+midi 90 43 64
+wait 60
+expect arp_held 3
+expect arp_on 1
+out
+wait 1000
+expect arp_fired >6
+expect arp_fired <10
+expect voices <4
+expect_out USB 90 3C 64
+expect_out USB 90 40 64
+expect_out USB 90 43 64
+midi B0 7B 00
+wait 300
+expect arp_held 0
+expect arp_on 0
+# ARP pages: ARP opens them; the mode steps; octaves and steps are counted values; the tempo on ARP 3's K4
+tap ARP
+wait 30
+expect page 15
+turn K1 1
+wait 30
+expect p59 1
+turn K3 1
+wait 30
+expect p61 43
+tap ARP
+wait 30
+expect page 16
+turn K3 -8
+wait 30
+expect p64 60
+tap ARP
+wait 30
+expect page 17
+turn K4 10
+wait 50
+expect bpm 130
+turn K4 -10
+wait 50
+expect bpm 120
+tap ARP
+wait 30
+expect page 18
+tap ARP
+wait 30
+expect page 15
+# Euclid: 8 steps, 3 hits: three notes a cycle (one second at 1/16 = 8 steps)
+tap ARP
+wait 30
+turn K2 -13
+wait 30
+expect p65 24
+tap HOME
+wait 30
+expect arp_reset 0
+midi 90 3C 64
+out
+wait 1010
+expect arp_fired >1
+expect arp_fired <5
+midi 80 3C 00
+wait 300
+expect arp_on 0
+# MIDI clock: 24 clocks a beat at 119 bpm; the arp follows and says EXT
+midi 90 3C 64
+wait 20
+clock 48
+wait 20
+expect ext 1
+clock 48
+wait 200
+midi 80 3C 00
+wait 2300
+expect ext 0
+tap PLAY
+wait 30
+expect p58 0
+tap HOME
+wait 30
+# DICE: SEQ makes a new patch from a new seed, named after it; the history goes back to what was there
+midi C0 00
+wait 60
+expect preset 0
+expect cutoff 110
+expect hist 0
+tap SEQ
+wait 60
+expect hist 1
+expect dirty 1
+tap SEQ
+wait 60
+expect hist 2
+# DISCOVER (SEQ held): the seed turns the patch, HISTORY goes back and forward
+press SEQ
+wait 900
+release SEQ
+wait 30
+expect page 19
+turn K4 -1
+wait 30
+expect hist_i 1
+turn K4 -1
+wait 30
+expect hist_i 0
+expect cutoff 110
+turn K4 1
+wait 30
+expect hist_i 1
+turn K1 3
+wait 60
+expect dirty 1
+# MUTATE counts; MORPH needs A and B (OCT- / OCT+ on this page), then blends the cutoff
+turn K2 3
+wait 60
+expect mutations 3
+midi C0 00
+wait 60
+tap OCT-
+wait 30
+midi C0 02
+wait 60
+expect cutoff 70
+tap OCT+
+wait 30
+spin K3 -64
+wait 60
+expect morph 0
+expect cutoff 110
+spin K3 127
+wait 60
+expect morph 127
+expect cutoff 70
+# the FX layer: FX held, the keys switch the effects (F3 ensemble, G3 delay, A3 reverb, B3 drive) and play no note;
+# a tap of FX still cycles its pages
+midi C0 01
+wait 60
+expect fxactive 7
+expect fxbypass 0
+tap HOME
+wait 30
+press FX
+wait 100
+key 4 down
+wait 40
+key 4 up
+wait 40
+expect fxbypass 4
+expect fxactive 3
+expect voices 0
+key 0 down
+wait 40
+key 0 up
+wait 40
+expect fxbypass 5
+release FX
+wait 60
+expect page 0
+press FX
+wait 100
+key 4 down
+wait 40
+key 4 up
+key 0 down
+wait 40
+key 0 up
+release FX
+wait 60
+expect fxbypass 0
+expect page 0
+tap FX
+wait 60
+expect page 5
+tap HOME
+wait 30
+# FM6: oscillator A as a six-operator voice; EDIT's fifth page is FM; the voice steps up to LIVE
+midi C0 00
+wait 60
+tap EDIT
+wait 30
+turn K1 8
+wait 60
+expect p0 8
+tap EDIT
+tap EDIT
+tap EDIT
+tap EDIT
+wait 30
+expect page 20
+turn K1 3
+wait 40
+expect fmvoice 3
+midi 90 3C 64
+wav fm_bell_voice.wav
+wait 800
+wavstop
+expect peak_db_min -36
+midi 80 3C 00
+wait 1200
+turn K1 29
+wait 40
+expect fmvoice 32
+tap HOME
+wait 30
+# the factory FM BELL patch is FM6 now: a chord, then its ring
+midi C0 05
+wait 60
+expect p0 8
+midi 90 3C 70
+midi 90 43 70
+midi 90 48 70
+wav fm_bell.wav
+wait 1500
+wavstop
+expect peak_db_min -30
+midi B0 7B 00
+wait 2000
+# an FM6 patch diced on its oscillators gets a diced LIVE voice
+press EDIT
+tap SEQ
+release EDIT
+wait 60
+expect fmvoice 32
+midi 90 3C 64
+wav fm_dice.wav
+wait 600
+wavstop
+expect peak_db_min -40
+midi 80 3C 00
+wait 1200
+# section dice: EDIT held with SEQ dices the oscillators only; the filter page's cutoff stays
+tap HOME
+wait 30
+midi C0 00
+wait 60
+press EDIT
+tap SEQ
+release EDIT
+wait 60
+expect cutoff 110
+expect dirty 1
+tap HOME
+wait 30
+# sound: each factory patch holds a chord; the WAVs are there to listen to, the peaks say they are alive
+midi C0 00
+wait 60
+midi 90 3C 64
+wav init.wav
+wait 600
+wavstop
+expect peak_db_min -30
+midi 80 3C 00
+wait 900
+midi C0 01
+wait 60
+midi 90 30 70
+midi 90 37 70
+midi 90 3C 70
+wav glass.wav
+wait 2000
+wavstop
+expect peak_db_min -28
+midi B0 7B 00
+wait 2500
+midi C0 02
+wait 60
+midi 90 30 100
+wav pdbass.wav
+wait 800
+wavstop
+expect peak_db_min -26
+midi 80 30 00
+wait 900
+midi C0 04
+wait 60
+midi 90 3C 70
+midi 90 43 70
+midi 90 47 70
+wav evolve.wav
+wait 2500
+wavstop
+expect peak_db_min -28
+midi B0 7B 00
+wait 3000
+midi C0 05
+wait 60
+midi 90 48 90
+wav bell.wav
+wait 1500
+wavstop
+expect peak_db_min -30
+midi 80 48 00
+wait 2000
+midi C0 06
+wait 60
+midi 90 3C 100
+wav synclead.wav
+wait 800
+wavstop
+expect peak_db_min -26
+midi 80 3C 00
+wait 900
+midi C0 07
+wait 60
+midi 90 3C 70
+midi 90 40 70
+midi 90 43 70
+wav vox.wav
+wait 2000
+wavstop
+expect peak_db_min -28
+midi B0 7B 00
+wait 2500
+# the reverb's tail dies away: GLASS KEYS released, the output 6 s on is far below where it was 2 s on
+midi C0 01
+wait 60
+midi 90 30 64
+midi 90 37 64
+midi 90 3C 64
+wait 1000
+midi B0 7B 00
+wait 1500
+peakreset
+wait 2000
+expect peak_db_max -30
+peakreset
+wait 4000
+expect peak_db_max -45
+peakreset
+wait 4000
+expect peak_db_max -60
+# the limiter: eight loud notes of SYNC LEAD at full MASTER stay under full scale
+midi C0 06
+wait 60
+master 4096
+midi 90 30 7F
+midi 90 34 7F
+midi 90 37 7F
+midi 90 3C 7F
+midi 90 40 7F
+midi 90 43 7F
+midi 90 48 7F
+midi 90 4C 7F
+peakreset
+wav loud.wav
+wait 1200
+wavstop
+expect peak_db_max 0
+midi B0 7B 00
+master 2048
+wait 1500
+# pitch bend, the mod wheel, aftertouch and a program change are taken
+midi C0 03
+wait 60
+expect preset 3
+midi 90 3C 64
+midi E0 00 60
+midi B0 01 40
+midi A0 3C 50
+midi D0 30
+wait 200
+midi E0 00 40
+midi B0 01 00
+midi 80 3C 00
+wait 900
+# the screen reader hears the page, the preset and the load
+listen
+wait 100
+said POCKET POLY. HOME. PRESET F4 WIRE PLUCK
+tap ARP
+wait 30
+said ARP 1
+# velocity and pressure (lib/touch.c): a key landing at 40 plays at about 40; pressed 80 % more, it has pressure
+key 7 down 40
+wait 60
+expect vel >30
+expect vel <50
+key 7 up
+wait 50
+key 7 down 100 80
+wait 600
+expect prs >40
+shot touch.png
+key 7 up
+wait 900
+# REC held a second: Bluetooth off (and saved: off after a restart too), then on again
+listen
+wait 1200
+press REC
+wait 1100
+release REC
+wait 50
+said BLUETOOTH OFF
+expect ble 0
+tap SAVE
+wait 30
+tap OCT+
+wait 60
+reboot
+wait 1200
+expect ble 0
+press REC
+wait 1100
+release REC
+wait 1200
+said BLUETOOTH ON
+expect ble 2
+# REC: look for Bluetooth MIDI devices, connect to the one found, let it go (lib/btdev)
+tap REC
+said BLE SCANNING
+wait 700
+said DEVICE BLE MIDI
+tap REC
+said CONNECTING BLE MIDI
+wait 500
+said DEVICE CONNECTED
+expect ble_dev 4
+tap REC
+said BLE DISCONNECTED
+wait 100
+expect ble_dev 0
+unsaid LOST
+# Bluetooth's two links, the computer's and the device's: TO_BLE goes to both; their MIDI comes in on PORT_BLE
+ble connect
+tap REC
+wait 700
+tap REC
+wait 500
+expect ble_dev 4
+expect room_ble 64
+expect room_ble_dev 64
+out
+key 7 down
+wait 50
+key 7 up
+wait 50
+expect_out BLE 80 3C 00
+expect_out BLE-DEV 80 3C 00
+midi BLE-DEV 90 3C 64
+wait 20
+expect note 60
+expect midi_in_from 8
+midi BLE 80 3C 00
+wait 20
+expect midi_in_from 2
+midi TRS 90 3C 64
+wait 20
+expect midi_in_from 0
+midi USB 80 3C 00
+wait 20
+expect midi_in_from 1
+ble disconnect
+expect room_ble 0
+expect room_ble_dev 64
+out
+key 7 down
+wait 50
+key 7 up
+wait 50
+expect_out BLE-DEV 80 3C 00
+expect_no_out BLE 80 3C 00
+tap REC
+wait 100
+expect ble_dev 0
+# MIDI: the sustain pedal (CC 64) holds released notes until it lifts
+tap HOME
+wait 30
+midi C0 00
+wait 60
+midi B0 40 7F
+midi 90 3C 64
+midi 90 40 64
+wait 60
+expect voices 2
+midi 80 3C 00
+midi 80 40 00
+wait 900
+expect voices 2
+midi B0 40 00
+wait 900
+expect voices 0
+# the pedal and the arp: released keys stay in the chord, the arp's own steps are not held; the pedal lifting with
+# every key up stops it
+tap PLAY
+wait 30
+expect p58 127
+midi B0 40 7F
+midi 90 3C 64
+midi 90 40 64
+wait 60
+midi 80 3C 00
+midi 80 40 00
+wait 700
+expect arp_held 2
+expect arp_on 1
+expect voices <3
+midi B0 40 00
+wait 300
+expect arp_held 0
+expect arp_on 0
+tap PLAY
+wait 30
+expect p58 0
+# the CC map: 74 cutoff, 71 resonance, 73 attack, 72 release, 16-19 the macros, 91 reverb, 93 ensemble, 94 delay;
+# CC 121 puts the controllers back
+midi C0 00
+wait 60
+midi B0 4A 20
+midi B0 47 30
+midi B0 49 05
+midi B0 48 50
+midi B0 10 11
+midi B0 13 22
+midi B0 5B 33
+midi B0 5D 44
+midi B0 5E 55
+wait 60
+expect p13 32
+expect p14 48
+expect p23 5
+expect p26 80
+expect p50 17
+expect p53 34
+expect p49 51
+expect p43 68
+expect p46 85
+expect dirty 1
+midi B0 40 7F
+midi 90 3C 64
+midi 80 3C 00
+midi B0 79 00
+wait 900
+expect voices 0
+# the MIDI page (SEL after MOD and MACROS): IN CH filters what comes in, OUT CH is the keys' and the arp's channel
+midi C0 00
+wait 60
+tap SEL
+wait 30
+expect page 13
+tap SEL
+wait 30
+expect page 14
+tap SEL
+wait 30
+expect page 21
+shot midi.png
+turn K1 2
+wait 30
+expect ch_in 2
+midi 90 3C 64
+wait 60
+expect voices 0
+midi 91 3C 64
+wait 60
+expect voices 1
+midi 81 3C 00
+wait 900
+expect voices 0
+turn K1 -2
+wait 30
+expect ch_in 0
+turn K2 2
+wait 30
+expect ch_out 3
+out
+key 7 down
+wait 50
+key 7 up
+wait 50
+expect_out USB 92 3C 64
+expect_out USB 82 3C 00
+turn K2 -2
+wait 30
+expect ch_out 1
+# LOCAL off: the keys send MIDI and play nothing
+turn K4 1
+wait 30
+expect local 0
+out
+key 7 down
+wait 60
+expect voices 0
+expect_out USB 90 3C 64
+key 7 up
+wait 50
+turn K4 1
+wait 30
+expect local 1
+# CLOCK OUT: start, 24 clocks a beat and stop go out while the arp runs on its own clock
+turn K3 1
+wait 30
+out
+tap PLAY
+wait 30
+expect p58 127
+midi 90 3C 64
+wait 1000
+expect_out USB FA 00 00
+expect clocks_out >44
+expect clocks_out <52
+midi 80 3C 00
+wait 100
+expect_out USB FC 00 00
+expect arp_on 0
+turn K3 1
+wait 30
+tap PLAY
+wait 30
+expect p58 0
+tap HOME
+wait 30
+# the MIDI settings are kept with SAVE and survive a reboot
+tap SEL
+tap SEL
+tap SEL
+wait 30
+turn K1 5
+wait 30
+expect ch_in 5
+expect dirty 1
+tap SAVE
+wait 30
+expect dialog 1
+tap OCT+
+wait 60
+expect dialog 0
+reboot
+wait 700
+expect ch_in 5
+tap SEL
+tap SEL
+tap SEL
+wait 30
+turn K1 -5
+wait 30
+expect ch_in 0
+tap SAVE
+wait 30
+tap OCT+
+wait 60
+expect dirty 0
+tap HOME
+# the effects rest while nothing passes through them: GLASS KEYS has every send open, yet idle, nothing runs;
+# a note wakes all three, and once its tails have rung out they rest again
+midi C0 01
+wait 1500
+expect fxrun 0
+midi 90 3C 64
+wait 100
+expect fxrun 7
+midi 80 3C 00
+wait 1500
+expect fxrun >0
+wait 9000
+expect fxrun 0
+midi C0 00
+wait 100
+# arp modes run: CHORD plays every held note each step (three times UP's count), RANDOM and TURING step too; the
+# TURING page's knobs leave it running
+tap HOME
+wait 30
+midi C0 00
+wait 60
+tap PLAY
+wait 30
+expect p58 127
+tap ARP
+wait 30
+turn K1 10
+wait 30
+expect p59 10
+expect arp_reset 0
+midi 90 3C 64
+midi 90 40 64
+midi 90 43 64
+wait 1000
+expect arp_fired >18
+expect voices >2
+midi B0 7B 00
+wait 300
+turn K1 -6
+wait 30
+expect p59 4
+expect arp_reset 0
+midi 90 3C 64
+midi 90 40 64
+midi 90 43 64
+wait 1000
+expect arp_fired >5
+expect arp_fired <11
+midi B0 7B 00
+wait 300
+turn K1 7
+wait 30
+expect p59 11
+tap ARP
+tap ARP
+tap ARP
+wait 30
+expect page 18
+spin K2 -5
+turn K4 1
+expect arp_reset 0
+midi 90 3C 64
+midi 90 40 64
+wait 1000
+expect arp_fired >3
+midi B0 7B 00
+wait 300
+tap ARP
+wait 30
+turn K1 -11
+wait 30
+expect p59 0
+# LATCH (ARP 3, K3): keys up, the arp keeps playing; a new key replaces the chord; all notes off ends it
+tap ARP
+tap ARP
+wait 30
+expect page 17
+turn K3 1
+wait 30
+expect p69 >63
+midi 90 3C 64
+midi 90 40 64
+wait 60
+midi 80 3C 00
+midi 80 40 00
+wait 300
+expect arp_on 1
+expect arp_held 2
+midi 90 43 64
+wait 60
+expect arp_held 1
+midi 80 43 00
+wait 100
+expect arp_on 1
+midi B0 7B 00
+wait 200
+expect arp_on 0
+turn K3 -1
+wait 30
+expect p69 <64
+# CHANCE 0 (ARP 3, K1): the steps come but no note sounds; RATCHET full (K2): more notes than steps
+spin K1 -127
+wait 30
+expect p67 0
+midi 90 3C 64
+midi 90 40 64
+wait 700
+expect voices 0
+midi B0 7B 00
+wait 100
+spin K1 127
+wait 30
+expect p67 127
+spin K2 127
+wait 30
+expect p68 127
+expect arp_reset 0
+midi 90 3C 64
+midi 90 40 64
+wait 1000
+expect arp_fired >10
+midi B0 7B 00
+wait 300
+spin K2 -127
+wait 30
+expect p68 0
+# MIDI clock: the arp follows while clocks come and lets go two seconds after they stop
+midi 90 3C 64
+wait 60
+clock 48 21
+expect ext 1
+wait 2600
+expect ext 0
+expect arp_on 1
+midi 80 3C 00
+wait 300
+expect arp_on 0
+# a program change while the arp runs: no voice is left hanging after the keys go up
+midi 90 3C 64
+midi 90 40 64
+wait 300
+midi C0 03
+wait 300
+midi 80 3C 00
+midi 80 40 00
+wait 1500
+expect voices 0
+midi C0 00
+wait 100
+expect p58 0
+tap HOME
+# CC 7 is a volume: at 32 the same note peaks about 12 dB lower; CC 120 stops every voice at once
+peakreset
+midi 90 3C 64
+wait 400
+midi 80 3C 00
+wait 700
+expect peak_db_max >-36
+expect peak_db_max <-20
+midi B0 07 20
+peakreset
+midi 90 3C 64
+wait 400
+midi 80 3C 00
+wait 700
+expect peak_db_max >-50
+expect peak_db_max <-32
+midi B0 07 7F
+midi 90 3C 64
+midi 90 40 64
+midi 90 43 64
+wait 100
+expect voices 3
+midi B0 78 00
+wait 20
+expect voices 0
+# review fixes. PLAY with keys held: the held notes end the old way and start again the new way (no voice hangs,
+# the note-off goes out); the same key released after an octave change ends the note it started
+midi C0 00
+wait 100
+out
+key 7 down
+wait 60
+expect voices 1
+tap PLAY
+wait 60
+expect p58 127
+expect arp_on 1
+key 7 up
+wait 1500
+expect voices 0
+expect arp_on 0
+expect_out USB 80 3C 00
+tap PLAY
+wait 30
+expect p58 0
+out
+key 7 down
+wait 60
+tap OCT+
+wait 60
+key 7 up
+wait 60
+expect_out USB 80 3C 00
+expect_no_out USB 80 48 00
+tap OCT-
+wait 900
+expect voices 0
+# history (five entries from the tests above): the first turn back after one DICE is the patch before it, forward
+# again is the diced one, and back once more adds nothing
+midi C0 00
+wait 100
+tap SEQ
+wait 200
+expect hist 6
+expect hist_i 5
+press SEQ
+wait 900
+release SEQ
+wait 30
+expect page 19
+turn K4 -1
+wait 30
+expect cutoff 110
+expect hist 7
+expect hist_i 5
+turn K4 1
+wait 30
+expect hist_i 6
+turn K4 -1
+wait 30
+expect hist 7
+expect hist_i 5
+tap HOME
+midi C0 00
+wait 100
+# the arp keeps time after MIDI clock stops: steps go on at the internal tempo (no silence, no burst); GATE at
+# its top ties the notes, so one is always sounding for the panic test after
+tap PLAY
+wait 30
+tap ARP
+wait 30
+spin K4 127
+wait 30
+expect p62 127
+tap HOME
+midi 90 3C 64
+wait 60
+clock 48 10
+expect ext 1
+wait 2200
+expect ext 0
+expect arp_reset 0
+wait 1000
+expect arp_fired >5
+expect arp_fired <11
+# CC 120 while the arp plays: its notes go out off
+out
+midi B0 78 00
+wait 60
+expect voices 0
+expect_out USB 80 3C 00
+midi 80 3C 00
+tap PLAY
+wait 30
+expect p58 0
+# the plate rings out when its send is turned to 0 right after a note (nothing is cut, nothing stays)
+midi C0 01
+wait 100
+midi 90 3C 64
+wait 300
+midi 80 3C 00
+midi B0 5B 00
+wait 600
+expect fxrun >3
+wait 9000
+expect fxrun 0
+midi C0 00
+wait 100
+# oscillator B has no FM6: the knob stops at WT C
+tap EDIT
+tap EDIT
+wait 30
+turn K1 9
+wait 30
+expect p4 7
+turn K1 -9
+wait 30
+expect p4 0
+tap HOME
+# an FM6 patch on the LIVE voice saved to a user slot keeps that voice: it becomes the slot's own bank voice (9 + u)
+midi C0 05
+wait 100
+tap EDIT
+tap EDIT
+tap EDIT
+tap EDIT
+tap EDIT
+wait 30
+expect page 20
+turn K1 29
+wait 60
+expect fmvoice 32
+tap SAVE
+wait 30
+turn K1 1
+wait 30
+tap OCT+
+wait 100
+expect preset 10
+expect fmvoice 10
+reboot
+wait 700
+expect preset 10
+expect fmvoice 10
+midi C0 00
+wait 100
