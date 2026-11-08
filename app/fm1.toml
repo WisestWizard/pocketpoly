@@ -13,7 +13,14 @@ cpu2 = true                    # the second core renders half the voices (plat_c
 cpu2_fallback = true           # if it misreads or is late: one core until power-off, no restart
 usb_audio_in = true            # the master output recordable over USB
 usb_audio_out = false
-# the site (tools/make_site.py)
+# the site (tools/make_site.py) and firmware.json, which the hubs read and a release build requires
+# (base/docs/FIRMWARE-JSON.md). install and site wait for Pocket Poly to have a published site: a release refuses
+# without install, and there is no page to point at yet (app/site/landing.md is not published anywhere)
 tagline = "a stereo polysynth with a discovery engine for the FM-1"
 licence = "MPL-2.0"
+author = "Kyle McCann"
+description = "Pocket Poly turns the M-VAVE FM-1 into a stereo hybrid polysynth. Eight voices, each with two oscillators that can be analog shapes, phase-distorted sines, wavetables or a six-operator FM voice, with sync, ring and cross modulation; a resonant filter with drive, three envelopes, two LFOs, an eight-slot modulation matrix and four macros on the knobs; then an ensemble, a tape delay, a plate reverb and a limiter. An arpeggiator with twelve modes, Euclidean rhythms, chance, ratchets and a Turing machine follows MIDI clock, and DICE, MUTATE and MORPH find new patches."
+tags = ["synth", "fm", "sequencer", "generative"]
+repo = "https://github.com/WisestWizard/deepfield"
+screenshot = "app/docs/img/screen-home.png"
 credits = "Built on fm1-base and felucca-bsp, from Felucca by Leo Kuroshita (Hügelton Instruments)."
