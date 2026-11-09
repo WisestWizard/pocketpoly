@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "pocketpoly",
+  "name": "Pocket Poly",
+  "author": "Kyle McCann",
+  "license": "MPL-2.0",
+  "tagline": "a stereo polysynth with a discovery engine for the FM-1",
+  "description": "Pocket Poly turns the M-VAVE FM-1 into a stereo hybrid polysynth. Eight voices, each with two oscillators that can be analog shapes, phase-distorted sines, wavetables or a six-operator FM voice, with sync, ring and cross modulation; a resonant filter with drive, three envelopes, two LFOs, an eight-slot modulation matrix and four macros on the knobs; then an ensemble, a tape delay, a plate reverb and a limiter. An arpeggiator with twelve modes, Euclidean rhythms, chance, ratchets and a Turing machine follows MIDI clock, and DICE, MUTATE and MORPH find new patches.",
+  "tags": ["synth", "fm", "sequencer", "generative"],
+  "source": "https://github.com/WisestWizard/pocketpoly",
+  "screenshot": "app/docs/img/screen-home.png",
+  "hardware": {
+    "models": ["FM-1"],
+    "flash": ["856014", "B36014"],
+    "features": ["bluetooth-midi", "bluetooth-midi-devices", "usb-audio-in", "second-core", "velocity", "pressure", "screen-reader"]
+  },
+  "credits": "Built on fm1-base and felucca-bsp, from Felucca by Leo Kuroshita (Hügelton Instruments)."
+}
